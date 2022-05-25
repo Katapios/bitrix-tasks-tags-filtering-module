@@ -154,14 +154,42 @@ BX.Tasks.GridActions = {
 
 	toggleFilter: function (options, selected)
 	{
-		console.log(options)
+		var filterManager = BX.Main.filterManager.getById(this.gridId);
+
+		if (!filterManager) {
+			console.log('BX.Main.filterManager not initialised');
+			return;
+		}
+
 		var filterManager = BX.Main.filterManager.getById(this.gridId);
 		var filterApi = filterManager.getApi();
 		var fields = filterManager.getFilterFieldsValues();
 
-		var tags = options
-		fields.TAG = tags
-		fields.TAG_label = tags
+		if (Array.isArray(fields.TAG) && fields.TAG.length){
+			this.tagContainer = fields.TAG
+		}
+
+
+		if (this.tagContainer.indexOf(options.TAG.toString()) != -1) {
+			var myIndex = this.tagContainer.indexOf(options.TAG);
+			if (myIndex !== -1) {
+				this.tagContainer.splice(myIndex, 1);
+			}
+
+			this.flag = true
+		} else {
+			this.flag = false
+		}
+
+		if (this.flag === false) {
+			this.tag = options.TAG;
+			this.tagContainer.push(this.tag)
+			this.flag = false
+		}
+
+		fields.TAG = this.tagContainer
+		fields.TAG_label = this.tagContainer
+
 		filterApi.setFields(fields);
 		filterApi.apply();
 	},
